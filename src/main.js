@@ -1,4 +1,5 @@
 import './plugins/bootstrap';
+import '@livelybone/vue-datepicker/lib/css/index.scss';
 
 import Vue from 'vue';
 import App from './App.vue';
