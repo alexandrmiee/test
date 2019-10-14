@@ -9,18 +9,18 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'counters',
-      component: viewImporter('Counters'),
+      name: 'accounts',
+      component: viewImporter('Accounts'),
     },
-    // {
-    //   path: "/modules",
-    //   name: "modules",
-    //   component: viewImporter("Modules")
-    // },
-    // {
-    //   path: "/control",
-    //   name: "control",
-    //   component: viewImporter("Control")
-    // }
+    {
+      path: '/opdays',
+      name: 'opdays',
+      component: viewImporter('OperationDays'),
+    },
+    {
+      path: '/operations',
+      name: 'operations',
+      component: viewImporter('Operations'),
+    },
   ],
 });

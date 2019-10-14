@@ -102,3 +102,9 @@ export const OpEntry = [
     OpDate: '2019-07-16',
   },
 ];
+
+export const OpDays = [
+  { OpDate: '2019-07-12' },
+  { OpDate: '2019-07-15' },
+  { OpDate: '2019-07-16' },
+];
