@@ -31,6 +31,10 @@ export default {
       const updatedItem = { ...state.accauntPos[index], [data.field.key]: data.value };
       state.accauntPos.splice(index, 1, updatedItem);
     },
+    deleteAccountRow(state, data) {
+      const index = state.accauntPos.findIndex(i => i === data.index);
+      state.accauntPos.splice(index, 1);
+    },
 
     addAccountOperations(state, row) {
       state.operationEntry.push(row);
@@ -40,6 +44,10 @@ export default {
       const updatedItem = { ...data.item, [data.field.key]: data.value };
       state.operationEntry.splice(index, 1, updatedItem);
     },
+    deleteOperationRow(state, data) {
+      const index = state.operationEntry.findIndex(i => i === data.index);
+      state.operationEntry.splice(index, 1);
+    },
 
     addOperationDays(state, row) {
       state.operationDays.push(row);
@@ -48,6 +56,10 @@ export default {
       const { index } = data.item;
       const updatedItem = { ...data.item, [data.field.key]: data.value };
       state.operationDays.splice(index, 1, updatedItem);
+    },
+    deleteDaysRow(state, data) {
+      const index = state.operationDays.findIndex(i => i === data.index);
+      state.operationDays.splice(index, 1);
     },
   },
   actions: {
@@ -60,6 +72,10 @@ export default {
     changeAccountRow({ commit }, data) {
       commit('changeAccountRow', data);
     },
+    deleteAccountRow({ commit }, data) {
+      console.log(data);
+      commit('deleteAccountRow', data);
+    },
 
     addAccountOperations({ commit, state }) {
       commit('addAccountOperations', {
@@ -69,6 +85,9 @@ export default {
     changeAccountOperationRow({ commit }, data) {
       commit('changeAccountOperationRow', data);
     },
+    deleteOperationRow({ commit }, data) {
+      commit('deleteOperationRow', data);
+    },
 
     addOperationDays({ commit, state }) {
       commit('addOperationDays', { OpDate: state.props.selectedDate, index: state.operationDays.length });
@@ -76,6 +95,10 @@ export default {
     changeOperationDaysRow({ commit }, data) {
       commit('changeOperationDaysRow', data);
     },
+    deleteDaysRow({ commit }, data) {
+      commit('deleteDaysRow', data);
+    },
+
   },
   getters: {
     operationAcctPosItems(state) {

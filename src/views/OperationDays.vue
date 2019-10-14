@@ -8,6 +8,7 @@
       :items="operationDays"
       :fields="opDays.fields"
       @row-clicked="selectOpDay"
+      @row-middle-clicked="deleteDaysRow"
     >
       <template v-slot:table-caption>Операционные дни</template>
       <template
@@ -27,6 +28,7 @@
       caption-top
       :items="opEntryOnDayItems"
       :fields="opEntry.fields"
+      @row-middle-clicked="deleteOperationRow"
     >
       <template v-slot:table-caption>Проводки по счету</template>
       <template
@@ -108,6 +110,10 @@ export default {
       changeOperationDaysRow: 'changeOperationDaysRow',
       addAccountOperations: 'addAccountOperations',
       changeAccountOperationRow: 'changeAccountOperationRow',
+
+      deleteAccountRow: 'deleteAccountRow',
+      deleteOperationRow: 'deleteOperationRow',
+      deleteDaysRow: 'deleteDaysRow',
     }),
     selectOpDay({ OpDate }) {
       this.setAccountProp({

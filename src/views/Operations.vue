@@ -8,6 +8,7 @@
       :items="operationEntry"
       :fields="opEntry.fields"
       @row-clicked="selectOpDayRow"
+      @row-middle-clicked="deleteOperationRow"
     >
       <template v-slot:table-caption>Проводки по счету</template>
       <template
@@ -27,6 +28,7 @@
       caption-top
       :items="operationAcctPosItems"
       :fields="acctPos.fields"
+      @row-middle-clicked="deleteAccountRow"
     >
       <template v-slot:table-caption>Счет с остатками</template>
       <template
@@ -112,6 +114,10 @@ export default {
       changeAccountRow: 'changeAccountRow',
       addAccountOperations: 'addAccountOperations',
       changeAccountOperationRow: 'changeAccountOperationRow',
+
+      deleteAccountRow: 'deleteAccountRow',
+      deleteOperationRow: 'deleteOperationRow',
+      deleteDaysRow: 'deleteDaysRow',
     }),
     selectOpDayRow({ OpDate, AcctNumDB, AcctNumCr }) {
       this.setAccountProp({
