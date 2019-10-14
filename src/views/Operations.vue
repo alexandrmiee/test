@@ -5,31 +5,53 @@
       striped
       hover
       caption-top
-      :items="opEntryItems"
+      :items="operationEntry"
       :fields="opEntry.fields"
       @row-clicked="selectOpDayRow"
     >
       <template v-slot:table-caption>Проводки по счету</template>
+      <template
+        v-slot:cell()="data"
+      >
+        <table-editable-field @input="changeOperationEntryValue($event,data)" :text="data.value"/>
+      </template>
     </b-table>
+    <p>
+      <b-button @click="addAccountOperations">Добавить запись</b-button>
+    </p>
 
     <b-table
       class="accounts__table"
       striped
       hover
       caption-top
-      :items="acctPosItems"
+      :items="operationAcctPosItems"
       :fields="acctPos.fields"
     >
       <template v-slot:table-caption>Счет с остатками</template>
+      <template
+        v-slot:cell()="data"
+      >
+        <table-editable-field @input="changeAccountValue($event,data)" :text="data.value"/>
+      </template>
     </b-table>
+    <p>
+      <b-button @click="addAccount">Добавить запись</b-button>
+    </p>
   </div>
 </template>
 
 <script>
-import { AcctPos, OpEntry } from '@/services/__fixture__/counters';
+import {
+  mapActions, mapState, mapGetters, mapMutations,
+} from 'vuex';
+import TableEditableField from '@/components/Table/TableEditableField.vue';
 
 export default {
   name: 'Accounts',
+  components: {
+    TableEditableField,
+  },
   data() {
     return {
       OpDate: '',
@@ -76,22 +98,44 @@ export default {
     };
   },
   computed: {
-    acctPosItems() {
-      return AcctPos.filter(item => (
-        (item.OpDate === this.OpDate)
-          && (item.AcctNum === this.AcctNumDB
-          || item.AcctNum === this.AcctNumCr)
-      ));
-    },
-    opEntryItems() {
-      return OpEntry;
-    },
+    ...mapGetters('account', [
+      'operationAcctPosItems',
+    ]),
+    ...mapState('account', ['operationEntry']),
   },
   methods: {
+    ...mapMutations('account', {
+      setAccountProp: 'setProp',
+    }),
+    ...mapActions('account', {
+      addAccount: 'addAccount',
+      changeAccountRow: 'changeAccountRow',
+      addAccountOperations: 'addAccountOperations',
+      changeAccountOperationRow: 'changeAccountOperationRow',
+    }),
     selectOpDayRow({ OpDate, AcctNumDB, AcctNumCr }) {
-      this.OpDate = OpDate;
-      this.AcctNumDB = AcctNumDB;
-      this.AcctNumCr = AcctNumCr;
+      this.setAccountProp({
+        prop: 'operationDate',
+        value: OpDate,
+      });
+      this.setAccountProp({
+        prop: 'accountNumDebit',
+        value: AcctNumDB,
+      });
+      this.setAccountProp({
+        prop: 'accountNumCredit',
+        value: AcctNumCr,
+      });
+      this.setAccountProp({
+        prop: 'selectedDate',
+        value: OpDate,
+      });
+    },
+    changeAccountValue(value, data) {
+      this.changeAccountRow({ ...data, value });
+    },
+    changeOperationEntryValue(value, data) {
+      this.changeAccountOperationRow({ ...data, value });
     },
   },
 };
@@ -102,6 +146,7 @@ export default {
 .accounts{
   margin: 20px;
   padding: 20px;
+  user-select: none;
 
   &__datepicker{
     width: 100px;

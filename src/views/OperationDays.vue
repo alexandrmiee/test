@@ -5,32 +5,55 @@
       striped
       hover
       caption-top
-      :items="opDaysItems"
+      :items="operationDays"
       :fields="opDays.fields"
       @row-clicked="selectOpDay"
     >
       <template v-slot:table-caption>Операционные дни</template>
+      <template
+        v-slot:cell()="data"
+      >
+        <table-editable-field @input="changeOperationDaysValue($event,data)" :text="data.value"/>
+      </template>
     </b-table>
+    <p>
+      <b-button @click="addOperationDays">Добавить запись</b-button>
+    </p>
+
     <b-table
       class="accounts__table"
       striped
       hover
       caption-top
-      :items="opEntryItems"
+      :items="opEntryOnDayItems"
       :fields="opEntry.fields"
     >
       <template v-slot:table-caption>Проводки по счету</template>
+      <template
+        v-slot:cell()="data"
+      >
+        <table-editable-field @input="changeOperationEntryValue($event,data)" :text="data.value"/>
+      </template>
     </b-table>
+    <p>
+      <b-button @click="addAccountOperations">Добавить запись</b-button>
+    </p>
   </div>
 </template>
 
 <script>
 
+import {
+  mapActions, mapState, mapGetters, mapMutations,
+} from 'vuex';
+import TableEditableField from '@/components/Table/TableEditableField.vue';
 
-import { OpDays, OpEntry } from '@/services/__fixture__/counters';
 
 export default {
   name: 'OperationDays',
+  components: {
+    TableEditableField,
+  },
   data() {
     return {
       selectedAcctOpDay: '',
@@ -38,6 +61,7 @@ export default {
       opDays: {
         fields: [
           {
+            key: 'OpDate',
             label: 'Дата операционного дня',
             sortable: true,
           },
@@ -70,16 +94,36 @@ export default {
     };
   },
   computed: {
-    opDaysItems() {
-      return OpDays;
-    },
-    opEntryItems() {
-      return OpEntry.filter(item => item.OpDate === this.selectedAcctOpDay);
-    },
+    ...mapGetters('account', [
+      'opEntryOnDayItems',
+    ]),
+    ...mapState('account', ['operationDays']),
   },
   methods: {
+    ...mapMutations('account', {
+      setAccountProp: 'setProp',
+    }),
+    ...mapActions('account', {
+      addOperationDays: 'addOperationDays',
+      changeOperationDaysRow: 'changeOperationDaysRow',
+      addAccountOperations: 'addAccountOperations',
+      changeAccountOperationRow: 'changeAccountOperationRow',
+    }),
     selectOpDay({ OpDate }) {
-      this.selectedAcctOpDay = OpDate;
+      this.setAccountProp({
+        prop: 'selectedAcctOpDay',
+        value: OpDate,
+      });
+      this.setAccountProp({
+        prop: 'selectedDate',
+        value: OpDate,
+      });
+    },
+    changeOperationDaysValue(value, data) {
+      this.changeOperationDaysRow({ ...data, value });
+    },
+    changeOperationEntryValue(value, data) {
+      this.changeAccountOperationRow({ ...data, value });
     },
   },
 };

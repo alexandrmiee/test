@@ -2,9 +2,9 @@
   <div class="accounts">
     <datepicker
       class="accounts__datepicker"
-      v-model="dateFilter"
-      :min="dateRange.min"
-      :max="dateRange.max"
+      v-model="selectedDate"
+      :min="accountOperationsDateRange.min"
+      :max="accountOperationsDateRange.max"
       :dayStr="dayStr"
       :scrollbarProps="{isMobile: false}"
       :popperProps="popperProps"
@@ -14,46 +14,64 @@
       striped
       hover
       caption-top
-      :items="acctPosItems"
+      :items="acctPosForDateItems"
       :fields="acctPos.fields"
       @row-clicked="selectAccRow"
     >
       <template v-slot:table-caption>Счета с остатками на дату</template>
+      <template
+        v-slot:cell()="data"
+      >
+        <table-editable-field @input="changeAccountValue($event,data)" :text="data.value"/>
+      </template>
     </b-table>
+    <p>
+      <b-button @click="addAccount">Добавить запись</b-button>
+    </p>
+
     <b-table
       class="accounts__table"
       striped
       hover
       caption-top
-      :items="opEntryItems"
+      :items="accountOperaionEntryItems"
       :fields="opEntry.fields"
     >
       <template v-slot:table-caption>Проводки по счету</template>
+      <template
+        v-slot:cell()="data"
+      >
+        <table-editable-field @input="changeOperationEntryValue($event,data)" :text="data.value"/>
+      </template>
     </b-table>
+    <p>
+      <b-button @click="addAccountOperations">Добавить запись</b-button>
+    </p>
   </div>
 </template>
 
 <script>
 
+import {
+  mapActions, mapState, mapGetters, mapMutations,
+} from 'vuex';
 
 import { Datepicker } from '@livelybone/vue-datepicker';
-import { AcctPos, OpEntry } from '@/services/__fixture__/counters';
+import TableEditableField from '@/components/Table/TableEditableField.vue';
 
 export default {
   name: 'Accounts',
   components: {
     Datepicker,
+    TableEditableField,
   },
   data() {
     return {
-      dayStr: ['7', '1', '2', '3', '4', '5', '6'],
+      dayStr: ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'],
       popperProps: {
         placement: 'bottom-start',
         positionFixed: true,
       },
-
-      dateFilter: '2019-07-12', // new Date().toISOString().split('T')[0]
-      selectedAcctNum: null,
       acctPos: {
         fields: [
           {
@@ -95,29 +113,50 @@ export default {
     };
   },
   computed: {
-    acctPosItems() {
-      return AcctPos.filter(item => item.OpDate === this.dateFilter);
-    },
-    opEntryItems() {
-      return OpEntry.filter(item => item.AcctNumCr === this.selectedAcctNum);
-    },
-    dateRange() {
-      return AcctPos.reduce((result, value) => {
-        result.max = (+new Date(value.OpDate) > +new Date(result.max)) ? value.OpDate : result.max;
-        result.min = (+new Date(value.OpDate) > +new Date(result.min)) ? result.min : value.OpDate;
-        return result;
+    ...mapGetters('account', [
+      'acctPosForDateItems',
+      'accountOperaionEntryItems',
+      'accountOperationsDateRange',
+    ]),
+    ...mapState('account', ['accauntPos']),
+    selectedDate: {
+      get() {
+        return this.$store.state.account.props.selectedDate;
       },
-      { min: this.dateFilter, max: this.dateFilter });
+      set(value) {
+        this.$store.commit('account/setProp', { prop: 'selectedDate', value });
+      },
     },
   },
   watch: {
-    dateFilter() {
-      this.selectedAcctNum = '';
+    selectedDate() {
+      this.setAccountProp({
+        prop: 'selectedAcctNum',
+        value: '',
+      });
     },
   },
   methods: {
+    ...mapMutations('account', {
+      setAccountProp: 'setProp',
+    }),
+    ...mapActions('account', {
+      addAccount: 'addAccount',
+      changeAccountRow: 'changeAccountRow',
+      addAccountOperations: 'addAccountOperations',
+      changeAccountOperationRow: 'changeAccountOperationRow',
+    }),
     selectAccRow({ AcctNum }) {
-      this.selectedAcctNum = AcctNum;
+      this.setAccountProp({
+        prop: 'selectedAcctNum',
+        value: AcctNum,
+      });
+    },
+    changeAccountValue(value, data) {
+      this.changeAccountRow({ ...data, value });
+    },
+    changeOperationEntryValue(value, data) {
+      this.changeAccountOperationRow({ ...data, value });
     },
   },
 };
@@ -128,6 +167,7 @@ export default {
 .accounts{
   margin: 20px;
   padding: 20px;
+  user-select: none;
 
   &__datepicker{
     width: 100px;
