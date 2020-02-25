@@ -16,3 +16,12 @@
 
 ### Удаление связанных запесей
 Не реализовано
+
+### PWA
+
+- собрать приложение `npm run build`
+- установить [Web Server for Chrome](https://chrome.google.com/webstore/detail/web-server-for-chrome/ofhbbkphhbklhfoeikjpcbhemlocgigb)
+- выбрать в Web Server for Chrome папку dist и запустить
+- открыть в браузере 127.0.0.1
+- установить приложение, нажав на "+" в браузерной строке
+- для установки в телефон, нужно раздать приложение через https
